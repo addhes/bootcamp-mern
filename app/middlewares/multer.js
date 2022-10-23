@@ -1,0 +1,44 @@
+const multer = require('multer');
+
+
+// var today = new Date();
+// var dd = String(today.getDate()).padStart(2, '0');
+// var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+// var yyyy = today.getFullYear();
+
+// today = mm + '-' + dd + '-' + yyyy;
+
+let today = new Date().toLocaleDateString('es-CL')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, today + '-' + file.originalname);
+    },
+});
+
+
+const fileFilter = (req, file, cb) => {
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg'){
+        cb(null, true);
+    } else {
+        cb(
+            {
+                message: 'Unsupported file format',
+            },
+            false
+        );
+    }
+};
+
+const uploadMiddleware = multer({
+    storage,
+    limits: {
+        fileSize: 3000000,
+    },
+    fileFilter: fileFilter
+})
+
+module.exports = uploadMiddleware
